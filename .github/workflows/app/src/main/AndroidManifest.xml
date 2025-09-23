@@ -1,0 +1,300 @@
+# APK: Mostrar 8 imágenes y reproducir audio al tocar (Kotlin, Android Studio)
+
+Este proyecto mínimo crea una APK que muestra 8 imágenes en una cuadrícula y, al tocar cada imagen, reproduce un audio asociado. Incluye instrucciones para agregar recursos y cómo compilar.
+
+---
+
+## Estructura del proyecto (resumen)
+
+```
+MyApp/
+├─ app/
+│  ├─ src/main/
+│  │  ├─ AndroidManifest.xml
+│  │  ├─ java/com/example/myapp/MainActivity.kt
+│  │  ├─ res/layout/activity_main.xml
+│  │  ├─ res/drawable/ (tus 8 imágenes: img1.png ... img8.png)
+│  │  ├─ res/raw/ (tus 8 audios: a1.mp3 ... a8.mp3)
+│  │  └─ res/values/strings.xml
+│  └─ build.gradle (module)
+├─ build.gradle (project)
+└─ gradle/ ...
+```
+
+---
+
+## Archivos clave
+
+### 1) `app/src/main/AndroidManifest.xml`
+
+```xml
+<manifest package="com.example.myapp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:allowBackup="true"
+        android:label="MyApp"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+```
+
+### 2) `app/src/main/java/com/example/myapp/MainActivity.kt`
+
+```kotlin
+package com.example.myapp
+
+import android.media.MediaPlayer
+import android.os.Bundle
+import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+
+class MainActivity : AppCompatActivity() {
+    private var mediaPlayer: MediaPlayer? = null
+
+    // Mapear ImageView id -> raw resource id
+    private val mapping = mapOf(
+        R.id.img1 to R.raw.a1,
+        R.id.img2 to R.raw.a2,
+        R.id.img3 to R.raw.a3,
+        R.id.img4 to R.raw.a4,
+        R.id.img5 to R.raw.a5,
+        R.id.img6 to R.raw.a6,
+        R.id.img7 to R.raw.a7,
+        R.id.img8 to R.raw.a8
+    )
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Asignar listeners a cada ImageView
+        for ((imgId, rawId) in mapping) {
+            val iv = findViewById<ImageView>(imgId)
+            iv.setOnClickListener {
+                playSound(rawId)
+            }
+        }
+    }
+
+    private fun playSound(resId: Int) {
+        // liberar si hay uno sonando
+        mediaPlayer?.let {
+            it.stop()
+            it.release()
+        }
+        mediaPlayer = MediaPlayer.create(this, resId)
+        mediaPlayer?.start()
+        // liberar al terminar
+        mediaPlayer?.setOnCompletionListener { mp ->
+            mp.release()
+            if (mediaPlayer === mp) mediaPlayer = null
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mediaPlayer?.let {
+            it.stop()
+            it.release()
+            mediaPlayer = null
+        }
+    }
+}
+```
+
+### 3) `app/src/main/res/layout/activity_main.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:padding="16dp"
+        android:rowGap="12dp"
+        android:columnGap="12dp">
+
+        <ImageView
+            android:id="@+id/img1"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img1"
+            android:contentDescription="Imagen 1" />
+
+        <ImageView
+            android:id="@+id/img2"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img2"
+            android:contentDescription="Imagen 2" />
+
+        <ImageView
+            android:id="@+id/img3"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img3"
+            android:contentDescription="Imagen 3" />
+
+        <ImageView
+            android:id="@+id/img4"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img4"
+            android:contentDescription="Imagen 4" />
+
+        <ImageView
+            android:id="@+id/img5"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img5"
+            android:contentDescription="Imagen 5" />
+
+        <ImageView
+            android:id="@+id/img6"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img6"
+            android:contentDescription="Imagen 6" />
+
+        <ImageView
+            android:id="@+id/img7"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img7"
+            android:contentDescription="Imagen 7" />
+
+        <ImageView
+            android:id="@+id/img8"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_columnWeight="1"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img8"
+            android:contentDescription="Imagen 8" />
+
+    </GridLayout>
+</ScrollView>
+```
+
+### 4) `app/src/main/res/values/strings.xml`
+
+```xml
+<resources>
+    <string name="app_name">MyApp</string>
+</resources>
+```
+
+### 5) `app/build.gradle` (module)
+
+```groovy
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.example.myapp'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.myapp"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+}
+```
+
+### 6) `build.gradle` (project)
+
+```groovy
+buildscript {
+    repositories { google(); mavenCentral() }
+}
+plugins {
+    id 'com.android.application' version '8.1.0' apply false
+    id 'org.jetbrains.kotlin.android' version '1.8.22' apply false
+}
+
+allprojects {
+    repositories { google(); mavenCentral() }
+}
+```
+
+---
+
+## Recursos (qué debes agregar)
+
+* Pon 8 imágenes en `app/src/main/res/drawable/` con nombres: `img1.png`, `img2.png`, ..., `img8.png`.
+
+  * Recomendación: optimiza tamaño (por ejemplo 1080×1080 o menos) y usa PNG/JPEG.
+* Pon 8 archivos de audio en `app/src/main/res/raw/` con nombres: `a1.mp3`, `a2.mp3`, ..., `a8.mp3`.
+
+  * Formatos válidos: mp3, ogg, wav. Evita archivos muy largos si quieres respuesta inmediata.
+
+---
+
+## Notas y mejoras opcionales
+
+* Si prefieres usar `RecyclerView` para mayor eficiencia -> puedo darte el código.
+* Para pausar/reanudar correctamente al recibir llamadas o al salir -> manejar `onStop`/`onResume` con `MediaPlayer`.
+* Si quieres mostrar título o texto para cada imagen, añade `TextView` debajo de cada `ImageView` o usa un `CardView`.
+* Para reproducir varios sonidos al mismo tiempo considera `SoundPool` en lugar de `MediaPlayer` (ideal para efectos cortos).
+
+---
+
+## Cómo compilar / generar APK
+
+1. Abre Android Studio -> `Open` -> selecciona la carpeta del proyecto.
+2. Espera a que sincronice Gradle.
+3. Menú `Build` -> `Build Bundle(s) / APK(s)` -> `Build APK(s)`.
+4. El APK resultante estará en `app/build/outputs/apk/debug/app-debug.apk`.
+
+O desde línea de comandos (con gradle wrapper en la carpeta del proyecto):
+
+```bash
+./gradlew assembleDebug
+```
+
+---
+
+Si quieres, te entrego el proyecto adaptado a *Jetpack Compose*, o con `RecyclerView`, o te genero el `zip` listo para abrir en Android Studio. ¿Qué prefieres?
