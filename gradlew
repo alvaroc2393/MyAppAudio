@@ -1,10 +1,6 @@
-#!/usr/bin/env sh
-
-##############################################################################
-##
-##  Gradle start up script for UN*X
-##
-##############################################################################
+#!/bin/sh
+# Gradle wrapper script
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-exec "$DIR/gradle/wrapper/gradle-wrapper.jar" "$@"
+exec "$JAVA_HOME/bin/java" -Xmx64m -cp "$DIR/gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain "$@"
+
